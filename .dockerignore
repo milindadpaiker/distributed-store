@@ -1,0 +1,14 @@
+# Ignore editor files and directories
+*.swp
+*.swo
+*.tmp
+.idea/
+.vscode/
+
+# Ignore Go build artifacts
+*.exe
+*.out
+*.o
+
+# Ignore version control files
+.git/

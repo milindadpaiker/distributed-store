@@ -8,25 +8,24 @@ import (
 )
 
 func main() {
-    // Get the hostname (container ID)
+    // Get hostname to identify the container
     hostname, err := os.Hostname()
     if err != nil {
-        log.Printf("Error getting hostname: %v", err)
         hostname = "unknown"
     }
     
-    // Configure logger to include hostname
+    // Configure logger with hostname prefix
     log.SetPrefix(fmt.Sprintf("[%s] ", hostname))
     
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         log.Printf("Request received on path: %s", r.URL.Path)
-        fmt.Fprintf(w, "%s Welcome to the Distributed Store!", hostname)
+        fmt.Fprintf(w, "Welcome to the Distributed Store! Served by: %s", hostname)
     })
 
     http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
         log.Printf("Health check request received")
         w.WriteHeader(http.StatusOK)
-        fmt.Fprintf(w, "Server is healthy11")
+        fmt.Fprintf(w, "Server is healthy! Node ID: %s", hostname)
     })
 
     port := "8080"
