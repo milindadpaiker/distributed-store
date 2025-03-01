@@ -1,0 +1,13 @@
+root = "."
+tmp_dir = "${AIR_TMP_DIR}"
+
+[build]
+# Use relative paths with ./ prefix
+cmd = "go build -o ./${AIR_TMP_DIR}/main ."
+bin = "./${AIR_TMP_DIR}/main"
+include_ext = ["go"]
+exclude_dir = ["tmp", "vendor", "tmp-node1", "tmp-node2", "tmp-node3"]
+poll = true
+
+[log]
+time = true

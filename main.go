@@ -19,7 +19,7 @@ func main() {
     
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         log.Printf("Request received on path: %s", r.URL.Path)
-        fmt.Fprintf(w, "Welcome to the Distributed Store! Served by: %s", hostname)
+        fmt.Fprintf(w, "Welcome to the Distributed Store 2.0! Served by: %s", hostname)
     })
 
     http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
