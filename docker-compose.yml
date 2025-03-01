@@ -1,42 +1,72 @@
 version: "3.9"
 services:
   node1:
+    image: distributed-raft-node:latest
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ./:/app
     environment:
-      - NODE_ID=1
+      - NODE_ID=node1
+      - BIND_ADDR=0.0.0.0:7000 # Raft port
+      - ADVERTISE_ADDR=node1:7000 # Advertised Raft address
+      - HTTP_BIND_ADDR=:8080 # HTTP API port
+      - BOOTSTRAP=true
+      - DATA_DIR=/app/data/node1
       - AIR_TMP_DIR=tmp-node1
+    networks:
+      - raft-net
 
   node2:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: distributed-raft-node:latest
     volumes:
       - ./:/app
     environment:
-      - NODE_ID=2
+      - NODE_ID=node2
+      - BIND_ADDR=0.0.0.0:7000
+      - ADVERTISE_ADDR=node2:7000
+      - HTTP_BIND_ADDR=:8080
+      - JOIN_ADDR=node1:7000 # Join the Raft cluster via node1's Raft port
+      - BOOTSTRAP=false
+      - DATA_DIR=/app/data/node2
       - AIR_TMP_DIR=tmp-node2
+    networks:
+      - raft-net
+    depends_on:
+      - node1
 
   node3:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: distributed-raft-node:latest
     volumes:
       - ./:/app
     environment:
-      - NODE_ID=3
+      - NODE_ID=node3
+      - BIND_ADDR=0.0.0.0:7000
+      - ADVERTISE_ADDR=node3:7000
+      - HTTP_BIND_ADDR=:8080
+      - JOIN_ADDR=node1:7000
+      - BOOTSTRAP=false
+      - DATA_DIR=/app/data/node3
       - AIR_TMP_DIR=tmp-node3
+    networks:
+      - raft-net
+    depends_on:
+      - node1
 
   nginx:
     image: nginx:latest
     ports:
-      - "8080:80" # Only the load balancer exposes a port to the host
+      - "8080:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - node1 # Corrected dependency: node1
-      - node2 # Corrected dependency: node2
-      - node3 # Corrected dependency: node3
+      - node1
+      - node2
+      - node3
+    networks:
+      - raft-net
+
+networks:
+  raft-net:
+    driver: bridge
